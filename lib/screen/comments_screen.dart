@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gunluk_burcun/providers/ThemeChangeProvider.dart';
+import 'package:gunluk_burcun/screen/details_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/card_item.dart';
 
-class CommentsScreen extends StatelessWidget {
+class CommentsScreen extends StatefulWidget {
 
    static const String route = "/comments";
 
@@ -39,33 +40,61 @@ class CommentsScreen extends StatelessWidget {
     [Color(0xffe36480),Color(0xffE3A3C9)], // balık
   ];
 
+  @override
+  _CommentsScreenState createState() => _CommentsScreenState();
+}
+
+class _CommentsScreenState extends State<CommentsScreen> {
+
+  bool mainPage = true;
+  String selectedSef = "";
+
+  void onClickGridItem(String selected){
+
+    setState(() {
+      mainPage = !mainPage;
+      selectedSef = selected;
+    });
+  }
+
+  Widget toggle(BuildContext context){
+
+    bool isDayTheme = Provider.of<ThemeChangeProvider>(context).isDayTheme;
+
+    if(mainPage){
+
+      int index = 0;
+
+     return GridView(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                mainAxisSpacing: 5,
+                crossAxisCount: 2,
+                childAspectRatio: 1.5),
+            children: CommentsScreen.names.keys.toList().map((item) {
+              return Container(
+                margin: EdgeInsets.all(2),
+                padding: EdgeInsets.all(3),
+                child: CardItem(
+                  title: item,
+                  sef_title: CommentsScreen.names[item],
+                  color: isDayTheme ? [Colors.white,Colors.white] : CommentsScreen.colors[index++],
+                  onClick: () => onClickGridItem(CommentsScreen.names[item]),
+                ),
+              );
+            }).toList(),
+      );
+
+    }else{
+
+      return DetailsScreen(selectedSef);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    bool isDayTheme = Provider.of<ThemeChangeProvider>(context).isDayTheme;
-    var index = 0;
-
-    return Scaffold(
-      body: Container(
-        child: GridView(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              mainAxisSpacing: 5,
-              crossAxisCount: 2,
-              childAspectRatio: 1.5),
-          children: names.keys.toList().map((item) {
-            return Container(
-              margin: EdgeInsets.all(2),
-              padding: EdgeInsets.all(3),
-              child: CardItem(
-                title: item,
-                sef_title: names[item],
-                color: isDayTheme ? [Colors.white,Colors.white] : colors[index++],
-              ),
-            );
-          }).toList(),
-        )
-      ),
+    return Container(
+      child: toggle(context),
     );
   }
 }

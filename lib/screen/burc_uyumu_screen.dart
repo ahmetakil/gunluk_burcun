@@ -5,14 +5,14 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'dart:convert' as convert;
 
-import '../screen/details_screen.dart';
+import 'details_screen.dart';
 
-class BurcUyumu extends StatefulWidget {
+class BurcUyumuScreen extends StatefulWidget {
   @override
-  _BurcUyumuState createState() => _BurcUyumuState();
+  _BurcUyumuScreenState createState() => _BurcUyumuScreenState();
 }
 
-class _BurcUyumuState extends State<BurcUyumu> {
+class _BurcUyumuScreenState extends State<BurcUyumuScreen> {
   String sef_title1;
   String sef_title2;
 

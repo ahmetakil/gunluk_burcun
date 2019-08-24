@@ -14,6 +14,10 @@ import '../styles/FontStyles.dart';
 class DetailsScreen extends StatefulWidget {
   static const String route = "/details";
 
+  final String sefTitle;
+
+  DetailsScreen(this.sefTitle);
+
   static String getNameFromSefTitle(String sefTitle) {
     List<String> titles = CommentsScreen.names.keys.toList();
     List<String> sef = CommentsScreen.names.values.toList();
@@ -25,9 +29,6 @@ class DetailsScreen extends StatefulWidget {
     }
     return "";
   }
-
-
-
 
   static Future<Map<String, dynamic>> makeRequest(
       String url, String sef_title, String date) async {
@@ -92,82 +93,21 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
-
-  int _selectIndex = 1;
-
-  void onNavigationClick(int index) {
-    setState(() {
-      _selectIndex = index;
-    });
-
-    if(_selectIndex == 0){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => HomePage(0),
-      ));
-    }else if(_selectIndex == 1){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => HomePage(1),
-      ));
-    }else if(_selectIndex == 2){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => HomePage(2),
-      ));
-    }else if(_selectIndex == 3){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => HomePage(3),
-      ));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final sef_title = ModalRoute.of(context).settings.arguments.toString();
-
     var now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
+    String sef_title = widget.sefTitle;
     //   String sef_title = CommentsScreen.names[_title];
 
     String url =
         'https://www.lab.bendivar.com/burc/api.php?burc_sef=$sef_title&tarih=$formattedDate';
 
-    final themeChangeProvider = Provider.of<ThemeChangeProvider>(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "${DetailsScreen.getNameFromSefTitle(sef_title)} Burcu",
-        ),
-          leading: IconButton(
-            onPressed: () {
-              themeChangeProvider.toggleDayNightView();
-            },
-            icon: Icon(themeChangeProvider.isDayTheme
-                ? Icons.brightness_7
-                : Icons.brightness_3),
-          )
-      ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: DetailsScreen.makeRequest(url, sef_title, formattedDate),
-        builder: (BuildContext ctx, snapshot) =>
-            DetailsScreen.buildDetails(sef_title, snapshot),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark), title: Text("Burcum")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat), title: Text("Yorumlar")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.help), title: Text("Burç Öğren")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.people), title: Text("Burç Uyumu")),
-        ],
-        currentIndex: _selectIndex,
-        selectedItemColor: Colors.lightBlue[300],
-        onTap: onNavigationClick,
-      ),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: DetailsScreen.makeRequest(url, sef_title, formattedDate),
+      builder: (BuildContext ctx, snapshot) =>
+          DetailsScreen.buildDetails(sef_title, snapshot),
     );
   }
 }

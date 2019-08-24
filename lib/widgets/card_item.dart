@@ -8,19 +8,14 @@ class CardItem extends StatelessWidget {
   final String sef_title;
   final String url;
   final List<Color> color;
+  final Function onClick;
 
-  CardItem({this.title, this.url = "", this.sef_title, this.color});
-
-  void showDetails(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed(DetailsScreen.route, arguments:
-      sef_title,
-    );
-  }
+  CardItem({this.title, this.url = "", this.sef_title, this.color,this.onClick});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => showDetails(context),
+      onTap: onClick,
       child: Card(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

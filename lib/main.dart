@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:gunluk_burcun/screen/first_time_screen.dart';
-import 'package:gunluk_burcun/widgets/burc_uyumu.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 import './providers/ThemeChangeProvider.dart';
+
+import './screen/mySign_screen.dart';
 import './screen/comments_screen.dart';
-import './screen/details_screen.dart';
+import './screen/learn_screen.dart';
+import './screen/burc_uyumu_screen.dart';
+
 import './screen/splash_screen.dart';
-import 'screen/learn_screen.dart';
+import './screen/details_screen.dart';
+import './screen/first_time_screen.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     ThemeData nightTheme = ThemeData(
         backgroundColor: Color.fromRGBO(65, 42, 88, 1),
         brightness: Brightness.dark,
@@ -35,7 +37,7 @@ class MyApp extends StatelessWidget {
     ThemeData dayTheme = ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
-        accentColor: Colors.amber,
+        accentColor: Colors.amber[800],
         backgroundColor: Colors.white,
         cardColor: Colors.white,
         primaryTextTheme: TextTheme(
@@ -45,7 +47,8 @@ class MyApp extends StatelessWidget {
                 fontSize: 20)));
 
     return ChangeNotifierProvider(
-      builder: (_) => ThemeChangeProvider(false), // This boolean determines opening theme
+      builder: (_) => ThemeChangeProvider(false),
+      // This boolean determines opening theme
       child: Consumer<ThemeChangeProvider>(builder: (context, themeCp, widget) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -53,9 +56,8 @@ class MyApp extends StatelessWidget {
           title: "Günlük Burcun",
           routes: {
             "/": (ctx) => SplashScreen(),
-            HomePage.route: (ctx) => HomePage(0),
+            HomePage.route: (ctx) => HomePage(),
             CommentsScreen.route: (ctx) => CommentsScreen(),
-            DetailsScreen.route: (ctx) => DetailsScreen(),
             FirstTime.route: (ctx) => FirstTime(),
           },
         );
@@ -67,99 +69,42 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatefulWidget {
   static const String route = "/home";
 
-  int firstPage = 0;
 
-  HomePage(this.firstPage);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectIndex;
 
-  @override
-  void initState() {
-    _selectIndex = widget.firstPage;
-    super.initState();
-  }
 
-  void onNavigationClick(int index) {
-    setState(() {
-      _selectIndex = index;
-    });
-  }
-  /*
   List<Widget> pages = [
     MySignScreen(),
-    CommentScreen(),
+    CommentsScreen(),
     LearnSignScreen(),
     BurcUyumuScreen(),
   ];
-   */
 
 
-  Widget mainContent() {
-    if (_selectIndex == 0) {
-      return FutureBuilder<SharedPreferences>(
-        future: SharedPreferences.getInstance(),
-        builder: (context,snapshot) {
-          if(!snapshot.hasData){
-            return CircularProgressIndicator();
-          }
 
-          var now = DateTime.now();
-          String formattedDate = DateFormat('yyyy-MM-10').format(now);
-
-          final sharedPreferences = snapshot.data;
-
-          String sef_title = sharedPreferences.getString("burc");
-
-          String url =
-              'https://www.lab.bendivar.com/burc/api.php?burc_sef=$sef_title&tarih=$formattedDate';
-          return FutureBuilder<Map<String, dynamic>>(
-              future: DetailsScreen.makeRequest(url, sef_title, formattedDate),
-              builder: (BuildContext ctx, snapshot) {
-                return DetailsScreen.buildDetails(sef_title, snapshot);
-              }
-          );
-        }
-      );
-
-    } else if (_selectIndex == 1) {
-      return Container(
-        color: Theme.of(context).backgroundColor,
-        child: CommentsScreen(),
-        // margin: EdgeInsets.only(top: 10),
-      );
-    } else if (_selectIndex == 2) {
-      return Container(
-        child: LearnItem(),
-      );
-    } else if (_selectIndex == 3) {
-      return Container(
-        child: BurcUyumu(),
-      );
-    } else {
-      return Text("Something went wrong");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-
     ThemeChangeProvider themeChangeProvider =
-        Provider.of<ThemeChangeProvider>(context);
+    Provider.of<ThemeChangeProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Container(
-          child: Text(
-            "Günlük Burç",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 34),
+    return DefaultTabController(
+      length: 4,
+      initialIndex: 0,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Container(
+            child: Text(
+              "Günlük Burç",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 34),
+            ),
           ),
-        ),
-          leading:IconButton(
+          leading: IconButton(
             onPressed: () {
               themeChangeProvider.toggleDayNightView();
             },
@@ -167,48 +112,55 @@ class _HomePageState extends State<HomePage> {
                 ? Icons.brightness_7
                 : Icons.brightness_3),
           ),
-        actions: <Widget>[
-          Container(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton(
-                onChanged: (_) {},
-                icon: Icon(Icons.settings,color: Colors.white,),
-                items: [
-                  DropdownMenuItem(
-                    child: Text("Ayarlar"),
-                    value: 0,
-                  ),
-                  DropdownMenuItem(
-                    child: Text("Hakkımızda"),
-                    value: 1,
-                  ),
-                ],
+          actions: <Widget>[
+            Container(
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  onChanged: (_) {},
+                  icon: Icon(Icons.settings, color: Colors.white,),
+                  items: [
+                    DropdownMenuItem(
+                      child: Text("Ayarlar"),
+                      value: 0,
+                    ),
+                    DropdownMenuItem(
+                      child: Text("Hakkımızda"),
+                      value: 1,
+                    ),
+                  ],
+                ),
               ),
+            )
+          ],
+        ),
+        body: TabBarView(
+          children: pages,
+        ),
+        bottomNavigationBar: TabBar(
+          tabs: const [
+            Tab(
+              text: "Burcum",
+              icon: Icon(Icons.bookmark,size: 24,),
             ),
-          )
-        ],
-      ),
-      body: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Color(0xf5f5f5),
-          ),
-          child: mainContent()),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark), title: Text("Burcum")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat), title: Text("Yorumlar")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.help), title: Text("Burç Öğren")),
-          BottomNavigationBarItem(
-                icon: Icon(Icons.people), title: Text("Burç Uyumu")),
-        ],
-        currentIndex: _selectIndex,
-        selectedItemColor: Colors.lightBlue[300],
-        onTap: onNavigationClick,
+            Tab(
+              child: Text("Yorumlar"),
+              icon: Icon(Icons.chat),),
+            Tab(
+              child: Text("Burç Öğren"),
+              icon: Icon(Icons.help),),
+            Tab(
+              child: Text("Burç Uyumu"),
+              icon: Icon(Icons.people),),
+          ],
+          onTap: (int index) {
+            if(index == 1){
+              print("You clicked yorumlar");
+            }
+          },
+          labelColor: Theme
+              .of(context)
+              .accentColor,
+        ),
       ),
     );
   }

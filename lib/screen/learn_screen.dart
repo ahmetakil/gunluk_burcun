@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 
 import 'details_screen.dart';
 
-class LearnItem extends StatefulWidget {
+class LearnSignScreen extends StatefulWidget {
   @override
-  _LearnItemState createState() => _LearnItemState();
+  _LearnSignScreenState createState() => _LearnSignScreenState();
 }
 
-class _LearnItemState extends State<LearnItem> {
+class _LearnSignScreenState extends State<LearnSignScreen> {
   int selectedDay;
   int selectedMonth;
   String selectedMonthText;
